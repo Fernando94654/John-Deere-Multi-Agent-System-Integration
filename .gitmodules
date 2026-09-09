@@ -1,0 +1,12 @@
+[submodule "John-Deere-Multi-Agent-System"]
+	path = John-Deere-Multi-Agent-System
+	url = https://github.com/Fernando94654/John-Deere-Multi-Agent-System.git
+	branch = main
+[submodule "John-Deere-Multi-Agent-Simulation"]
+	path = John-Deere-Multi-Agent-Simulation
+	url = https://github.com/Fernando94654/John-Deere-Multi-Agent-Simulation.git
+	branch = master
+[submodule "John-Deere-MultiAgents-Website"]
+	path = John-Deere-MultiAgents-Website
+	url = https://github.com/jorgenavarro13/John-Deere-MultiAgents-Website.git
+	branch = main
