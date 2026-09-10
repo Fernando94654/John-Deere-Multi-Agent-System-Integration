@@ -1,0 +1,21 @@
+services:
+  server:
+    command:
+      - --host
+      - 0.0.0.0
+      - --web-port
+      - "8080"
+      - --with-mcp
+      - --autostart
+      - --rows
+      - "16"
+      - --cols
+      - "22"
+      - --harvesters
+      - "4"
+      - --carts
+      - "2"
+      - --delay
+      - "1.0"
+    ports:
+      - "127.0.0.1:${MCP_PORT:-8766}:8766"

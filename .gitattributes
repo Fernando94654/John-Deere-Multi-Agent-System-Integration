@@ -1,0 +1,3 @@
+unity-build/Build/*.data filter=lfs diff=lfs merge=lfs -text
+unity-build/Build/*.wasm filter=lfs diff=lfs merge=lfs -text
+unity-build/Build/* linguist-generated=true -whitespace

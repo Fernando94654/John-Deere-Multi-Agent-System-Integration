@@ -1,0 +1,10 @@
+.env
+.runtime/
+unity-build/*
+!unity-build/.gitkeep
+!unity-build/Build/
+unity-build/Build/*
+!unity-build/Build/WebDevelopmentTest3.loader.js
+!unity-build/Build/WebDevelopmentTest3.framework.js
+!unity-build/Build/WebDevelopmentTest3.data
+!unity-build/Build/WebDevelopmentTest3.wasm
