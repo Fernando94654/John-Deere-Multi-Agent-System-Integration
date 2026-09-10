@@ -1,3 +1,13 @@
+networks:
+  # Pinned so the bridge gateway IP is known ahead of container startup: the
+  # native OpenClaw gateway relay (docker/openclaw.sh) binds to it, and the
+  # server container is told the same address via OPENCLAW_GATEWAY_HOST below.
+  default:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+          gateway: 172.28.0.1
+
 services:
   server:
     command:
@@ -19,3 +29,10 @@ services:
       - "1.0"
     ports:
       - "127.0.0.1:${MCP_PORT:-8766}:8766"
+    environment:
+      # The gateway itself only binds loopback; docker/openclaw.sh runs a small
+      # relay on the bridge gateway IP so this container can reach it without
+      # widening the gateway's own exposure.
+      OPENCLAW_GATEWAY_HOST: 172.28.0.1
+      OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:?run.sh must export this}
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?run.sh must export this}

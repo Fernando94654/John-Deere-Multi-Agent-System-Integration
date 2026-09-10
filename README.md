@@ -298,7 +298,11 @@ Changing a submodule pointer does not rebuild the compiled player: export Unity
 again when you need newer scene or script changes reflected in the browser.
 
 The updated website also includes fleet recommendations and a chat UI. Those
-features depend on the corresponding server support. In particular, the current
-chat backend reads a local OpenClaw configuration and connects to host loopback;
-its browser-chat path is not yet wired across Docker's network. The native
-`agent/run-demo.sh` supports that path; Docker's optional MCP supervisor still works.
+features depend on the corresponding server support. With `--with-openclaw`,
+the browser chat is relayed across Docker's network to the loopback-bound
+gateway: `run.sh` reads the gateway's port and credential from the local
+OpenClaw config and hands them to the `server` container as
+`OPENCLAW_GATEWAY_PORT`/`OPENCLAW_GATEWAY_TOKEN`, and `docker/openclaw.sh`
+starts a small relay (`docker/gateway_relay.py`) on the Docker bridge gateway
+IP that forwards to the gateway's real loopback address — the gateway itself
+stays loopback-only. `./run.sh down` stops the relay along with Docker.

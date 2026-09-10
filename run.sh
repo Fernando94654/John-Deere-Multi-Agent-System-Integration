@@ -33,8 +33,27 @@ case "$action" in
       command -v openclaw >/dev/null || {
         echo "OpenClaw is not installed. See the server README for setup." >&2; exit 1;
       }
-      [[ -f "${OPENCLAW_CONFIG_PATH:-$HOME/.openclaw/openclaw.json}" ]] || {
+      config_path="${OPENCLAW_CONFIG_PATH:-$HOME/.openclaw/openclaw.json}"
+      [[ -f "$config_path" ]] || {
         echo "Configure OpenClaw first. See agent/openclaw.example.json5." >&2; exit 1;
+      }
+      # The server container has no OpenClaw config of its own; hand its browser
+      # chat bridge the gateway's port and credential directly (see docker/openclaw.sh
+      # for the loopback relay that makes the gateway reachable from the container).
+      mapfile -t gateway_env < <(python3 - "$config_path" <<'PY'
+import json, sys
+with open(sys.argv[1]) as f:
+    config = json.load(f)
+gateway = config.get("gateway", {})
+auth = gateway.get("auth", {})
+print(gateway.get("port", 18789))
+print(auth.get("token") or auth.get("password") or "")
+PY
+)
+      export OPENCLAW_GATEWAY_PORT="${gateway_env[0]:-}"
+      export OPENCLAW_GATEWAY_TOKEN="${gateway_env[1]:-}"
+      [[ -n "$OPENCLAW_GATEWAY_PORT" && -n "$OPENCLAW_GATEWAY_TOKEN" ]] || {
+        echo "Could not read gateway.port and gateway.auth.token/password from $config_path." >&2; exit 1;
       }
     fi
     for path in John-Deere-Multi-Agent-System/Servidor/server.py John-Deere-MultiAgents-Website/package.json; do
@@ -70,7 +89,14 @@ case "$action" in
       exec bash docker/openclaw.sh
     fi
     ;;
-  down) "${compose[@]}" down ;;
+  down)
+    relay_pidfile=.runtime/gateway-relay.pid
+    if [[ -f "$relay_pidfile" ]]; then
+      kill "$(cat "$relay_pidfile")" 2>/dev/null || true
+      rm -f "$relay_pidfile"
+    fi
+    "${compose[@]}" down
+    ;;
   logs) "${compose[@]}" logs --follow ;;
   status) "${compose[@]}" ps ;;
 esac
